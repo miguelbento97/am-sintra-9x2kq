@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>AM Sintra — 29 jul 2026</title>
+<style>
+
+  :root{
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1a1d23; --muted:#5c6470; --line:#e4e7ec;
+    --red:#c0392b; --red-bg:#fdf0ee; --amber:#9a6700; --amber-bg:#fff8e6; --green:#1a7f4b; --green-bg:#eaf7f0;
+    --blue:#1d4ed8; --blue-bg:#eef2ff; --accent:#243b53;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 60px}
+  header{margin-bottom:18px}
+  h1{font-size:21px;margin:0 0 4px;color:var(--accent)}
+  .sub{color:var(--muted);font-size:13px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:18px 0}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .tile .v{font-size:19px;font-weight:700;color:var(--accent)}
+  .tile .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .fbtn{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:6px 14px;cursor:pointer;font-size:13px;color:var(--ink)}
+  .fbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  thead th{position:sticky;top:0;background:var(--accent);color:#fff;text-align:left;padding:9px 10px;font-size:12px;font-weight:600;z-index:2}
+  tbody td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+  tbody tr:hover{background:#fbfcfe}
+  .num{white-space:nowrap;font-weight:700;color:var(--accent)}
+  .prop{white-space:nowrap;color:var(--muted);font-size:12px}
+  .val{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .chip{display:inline-block;border-radius:14px;padding:2px 10px;font-size:12px;font-weight:600;white-space:nowrap}
+  .c-red{background:var(--red-bg);color:var(--red)}
+  .c-amber{background:var(--amber-bg);color:var(--amber)}
+  .c-green{background:var(--green-bg);color:var(--green)}
+  .c-none{background:#eef1f5;color:var(--muted)}
+  .voto{font-weight:600}
+  .v-fav{color:var(--green)} .v-res{color:var(--amber)} .v-esc{color:var(--red)} .v-na{color:var(--muted);font-weight:400}
+  .nota{color:var(--muted);font-size:12.5px}
+  .secrow td{background:#eef1f5;font-weight:700;font-size:12px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase;padding:6px 10px}
+  details{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+  summary{cursor:pointer;font-weight:600;color:var(--accent)}
+  .bloco{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:4px 18px;margin-top:10px;font-size:12.5px}
+  .bloco div{padding:3px 0;border-bottom:1px dashed var(--line);color:var(--muted)}
+  .bloco b{color:var(--ink);font-weight:600}
+  .foot{margin-top:18px;font-size:12px;color:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 4px;font-size:12.5px;color:var(--muted)}
+
+/* tabs */
+.tabs{display:flex;gap:6px;margin:16px 0 20px;border-bottom:2px solid var(--line)}
+.tab{font-family:"Segoe UI",system-ui,sans-serif;font-size:14.5px;font-weight:600;padding:10px 22px;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent2)}
+.tabpane{display:none} .tabpane.active{display:block}
+/* vote selects */
+.vsel{font-family:"Segoe UI",system-ui,sans-serif;font-size:12.5px;font-weight:600;padding:4px 6px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;max-width:150px}
+.vsel.o-favor{color:var(--green);border-color:var(--green)}
+.vsel.o-reservas{color:var(--amber);border-color:var(--amber)}
+.vsel.o-abst{color:#6b7280;border-color:#9ca3af}
+.vsel.o-contra{color:var(--red);border-color:var(--red)}
+.vsel.o-esclarecer{color:var(--red);border-color:var(--red);background:var(--red-bg)}
+.vsel.changed{box-shadow:0 0 0 2px var(--blue-bg)}
+.sug{font-size:10.5px;color:var(--muted);margin-top:3px;font-family:"Segoe UI",system-ui,sans-serif}
+.savebar{font-family:"Segoe UI",system-ui,sans-serif;display:flex;gap:10px;align-items:center;margin:10px 0;font-size:12.5px;color:var(--muted)}
+.savebar button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12.5px}
+#savemsg{color:var(--green);font-weight:600}
+/* resumos scoped */
+#tab-resumos{font-family:Georgia,"Times New Roman",serif;font-size:15.5px;line-height:1.62;max-width:860px}
+#tab-resumos header{border-bottom:3px solid var(--accent);padding-bottom:14px;margin-bottom:22px}
+#tab-resumos h1{font-family:"Segoe UI",system-ui,sans-serif;font-size:22px;margin:0 0 6px;color:var(--accent)}
+#tab-resumos .sub{color:var(--muted);font-size:13.5px;font-family:"Segoe UI",system-ui,sans-serif}
+#tab-resumos h2{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:#fff;background:var(--accent);padding:7px 14px;border-radius:6px;margin:38px 0 6px}
+#tab-resumos h3{font-family:"Segoe UI",system-ui,sans-serif;font-size:16.5px;color:var(--accent);margin:26px 0 4px}
+#tab-resumos h3 .p{color:var(--muted);font-weight:400;font-size:13px}
+#tab-resumos p{margin:9px 0}
+#tab-resumos .kv{font-family:"Segoe UI",system-ui,sans-serif;font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent2);border-radius:6px;padding:8px 12px;margin:10px 0}
+#tab-resumos .toc{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:"Segoe UI",system-ui,sans-serif;font-size:13.5px;columns:2;column-gap:24px}
+#tab-resumos .toc a{color:var(--accent2);text-decoration:none;display:block;padding:2px 0}
+#tab-resumos .toc a:hover{text-decoration:underline}
+#tab-resumos em{color:var(--ink)}
+#tab-resumos .nota-metodo{font-size:13px;color:var(--muted);font-style:italic;margin-top:40px;border-top:1px solid var(--line);padding-top:14px}
+@media(max-width:640px){.toc{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Assembleia Municipal de Sintra — 8.ª Sessão Extraordinária</h1>
+  <div class="sub">Quarta-feira, <b>29 de julho de 2026, 18h30</b> · Palácio Valenças · Edital n.º 12/26 · <b>86 pontos</b> · Sessão inicia com Intervenção do Público · Transmissão no YouTube da CMS</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-tab="votacao">🗳 Votação &amp; porquê</button>
+  <button class="tab" data-tab="resumos">📖 Resumos das propostas</button>
+</div>
+
+<div id="tab-votacao" class="tabpane active">
+<div class="savebar">
+  <span>As tuas escolhas de voto ficam guardadas neste browser.</span>
+  <button id="btn-reset">↺ Repor sugestões</button>
+  <span id="savemsg"></span>
+</div>
+
+<header>
+  <h1>Assembleia Municipal de Sintra — 8.ª Sessão Extraordinária</h1>
+  <div class="sub">Quarta-feira, <b>29 de julho de 2026, 18h30</b> · Palácio Valenças · Edital n.º 12/26 · <b>86 pontos</b> · Sessão inicia com Intervenção do Público (máx. 8 inscrições) · Transmissão no YouTube da CMS</div>
+</header>
+
+<div class="tiles">
+  <div class="tile"><div class="v">15,0 M€</div><div class="l">Reforço aos SMAS (pontos 3+6) — o tema da noite</div></div>
+  <div class="tile"><div class="v">+74,9 M€</div><div class="l">Novos compromissos plurianuais 2027-30 (ponto 5)</div></div>
+  <div class="tile"><div class="v">13,18 M€</div><div class="l">6 empreitadas plurianuais (ponto 4)</div></div>
+  <div class="tile"><div class="v">1,40 M€</div><div class="l">Aquisição edifício Estefânia (ponto 25)</div></div>
+  <div class="tile"><div class="v">63,6 k€</div><div class="l">Apoios a juntas: 53 k€ + 10,6 k€ em géneros (12-17)</div></div>
+  <div class="tile"><div class="v">61</div><div class="l">Regularizações de sedes — Lei 29/2024 (pontos 26-86)</div></div>
+</div>
+
+<div class="legend">
+  <span>🔴 exige esclarecimento antes de votar</span>
+  <span>🟡 favor com reservas / reparo</span>
+  <span>🟢 rotina, bem instruído</span>
+  <span>◽ sem votação (conhecimento / intervenções)</span>
+</div>
+
+<div class="filters">
+  <button class="fbtn active" data-f="all">Todos os 86 pontos</button>
+  <button class="fbtn" data-f="red">🔴 Red flags</button>
+  <button class="fbtn" data-f="amber">🟡 Atenção</button>
+  <button class="fbtn" data-f="green">🟢 OK</button>
+  <button class="fbtn" data-f="none">◽ Sem votação</button>
+</div>
+
+<table id="tbl">
+<thead><tr>
+  <th style="width:44px">Pt.</th><th style="width:92px">Proposta</th><th>Assunto</th><th style="width:120px">Valor</th><th style="width:76px">Flag</th><th style="width:150px">Sugestão de voto</th><th style="width:30%">Porquê</th>
+</tr></thead>
+<tbody>
+<tr class="secrow"><td colspan="7">Período inicial</td></tr>
+<tr data-key="r1" data-f="green"><td class="num">1</td><td class="prop">Atas 07 e 08/26</td><td>Expediente + atas das sessões de 16/06 (extraordinária e ordinária)</td><td class="val">—</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Rotina. Regra: quem não esteve presente na sessão abstém-se na ata.</td></tr>
+<tr data-key="r2" data-f="none"><td class="num">2</td><td class="prop">—</td><td>Intervenção dos Grupos Políticos Municipais (art. 39.º/3 Regimento)</td><td class="val">—</td><td><span class="chip c-none">◽</span></td><td class="voto v-na">Sem votação</td><td class="nota">—</td></tr>
+
+<tr class="secrow"><td colspan="7">Finanças — o bloco central da sessão</td></tr>
+<tr data-key="r3" data-f="red"><td class="num">3</td><td class="prop">699-P/2026</td><td><b>Reforço financeiro de 15 M€ aos SMAS</b> (transferência de capital não reembolsável), na sequência da anulação do concurso de aluguer de 69 viaturas RSU (70,6 M€+IVA) e compra direta da frota (17,2 M€)</td><td class="val"><b>15 000 000 €</b></td><td><span class="chip c-red">🔴</span></td><td><select class="vsel" data-default="esclarecer" title="Sugestão original: Esclarecer → senão Abstenção/Contra"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Esclarecer → senão Abstenção/Contra</div></td><td class="nota">A fundamentação diz "repor capacidade de investimento em água/saneamento", mas ~90% dos 15 M€ (ver pt. 6) vai para frota/equipamento RSU (10,43 M€ transporte + 3,10 M€ equip. básico) e só ~1,47 M€ para água/saneamento. O próprio anexo admite que a compra "não introduziu dificuldades de tesouraria". PS votou contra na CMS.</td></tr>
+<tr data-key="r4" data-f="green"><td class="num">4</td><td class="prop">753-P/2026</td><td>Encargos plurianuais de 6 empreitadas de espaço público (Montelavar, Massamá, Casal de Cambra, ciclável Agualva, Rio de Côes, Pq. Hibiscos) — tudo 2027-2030</td><td class="val">13 176 415 €</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Bem instruído (declaração de dotação DFIN); unanimidade na CMS. Nota: fundamentação dos atrasos é genérica e 2 das 6 são ações novas.</td></tr>
+<tr data-key="r5" data-f="amber"><td class="num">5</td><td class="prop">825-P/2026</td><td>2.ª Revisão Orçamento/GOP 2026-2030: neutra em 2026 (633,7 M€ inalterado); inscreve Polo Escolar Rui Grácio (9,05 M€) e Complexo Desp. Monte Abraão (2,5 M€); <b>+74,9 M€ plurianuais</b>; reprograma Ferreira Dias (−13,1 M€ em 2026), Serra das Minas e Algueirão</td><td class="val">+74 896 592 € (2027-30)</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ reservas"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ reservas</div></td><td class="nota">Os +74,9 M€ vêm agregados, sem fonte de financiamento futura identificada (salto de +43,5 M€ só em 2028). Ferreira Dias adia 64% da dotação de 2026 → derrapagem clara no parque escolar. PS absteve-se na CMS.</td></tr>
+<tr data-key="r6" data-f="red"><td class="num">6</td><td class="prop">826-P/2026</td><td>Homologar Revisão Orçamental 2/2026 dos SMAS — integra os 15 M€ do ponto 3 (eficácia condicionada à aprovação do pt. 3)</td><td class="val">+15 000 000 €</td><td><span class="chip c-red">🔴</span></td><td><select class="vsel" data-default="esclarecer" title="Sugestão original: Coerência com pt. 3"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Coerência com pt. 3</div></td><td class="nota">É aqui que se vê o destino real dos 15 M€: 10,43 M€ equipamento de transporte + 3,10 M€ equipamento básico. Excedente de ~8,7 M€ em "transporte" face à 2.ª fase anunciada (5,04 M€) sem explicação. Mapas anexos não isolam a revisão (transparência fraca).</td></tr>
+
+<tr class="secrow"><td colspan="7">Eleições e urbanismo</td></tr>
+<tr data-key="r7" data-f="green"><td class="num">7</td><td class="prop">793-EB/2026</td><td>Listas de Juízes Sociais 2026/2028 (tribunais de menores): 44 candidatos → 15 efetivos + 15 suplentes</td><td class="val">—</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Processo bem instruído (edital, critérios, mapa de seleção).</td></tr>
+<tr data-key="r8" data-f="amber"><td class="num">8</td><td class="prop">695-P/2026</td><td>Prorrogar por 1 ano as medidas preventivas da suspensão parcial do PP Área Central do Cacém (Estratégia Local de Habitação); parecer favorável CCDR-LVT</td><td class="val">—</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor ✓ (decidido)"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor ✓ (decidido)</div></td><td class="nota">Posição da bancada: a favor. Manter o reparo em ata: medidas caducaram a 19/07 e a AM só vota a 29/07 — hiato de 10 dias a esclarecer juridicamente; pedir cronograma até jul/2027 (última prorrogação possível).</td></tr>
+<tr data-key="r9" data-f="green"><td class="num">9</td><td class="prop">798-FD/2026</td><td>Contrato interadministrativo Sintra/Amadora — projeto de execução da requalificação do Vale da Ribeira de Carenque (Eixo Verde e Azul, ~6 km)</td><td class="val">128 400 €+IVA (60%)</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Só o projeto; a empreitada futura exigirá aditamento e nova deliberação. Repartição 60/40 proporcional ao território.</td></tr>
+<tr data-key="r10" data-f="none"><td class="num">10</td><td class="prop">700-P/2026</td><td>UE Parque Ciência e Tecnologia Norte (13,5 ha, Rio de Mouro) — <b>tomar conhecimento</b>. 7 promotores privados; Município constrói via circular + parque florestal; taxas −50%; privados entregam 53 567 m² p/ parque</td><td class="val">—</td><td><span class="chip c-amber">🟡</span></td><td class="voto v-na">Tomar conhecimento</td><td class="nota">Sem votação, mas regista: encargos municipais (via + parque) não quantificados; desconto de 50% de taxas depende de regulamento habilitante; possível ressarcimento em numerário a privados. Discussão pública: 0 participações.</td></tr>
+<tr data-key="r11" data-f="none"><td class="num">11</td><td class="prop">701-P/2026</td><td>UE Albarraque Sul (5,5 ha, 88 fogos) — <b>tomar conhecimento</b>. 2 promotores privados; Município constrói e mantém o parque de 2,15 ha; privados cedem piso térreo do lote L1; taxas −50% (regulamento já aprovado 26/05)</td><td class="val">—</td><td><span class="chip c-amber">🟡</span></td><td class="voto v-na">Tomar conhecimento</td><td class="nota">3 participações na discussão pública (tráfego no nó da EN249-2, volumetria 4-6 pisos junto a moradias); só 1 ajuste de pormenor acolhido. Encargo do parque não quantificado.</td></tr>
+
+<tr class="secrow"><td colspan="7">Apoios a juntas de freguesia</td></tr>
+<tr data-key="r12" data-f="green"><td class="num">12</td><td class="prop">698-P/2026</td><td>JF Rio de Mouro — Festas da Vila (custo total ~90 k€; apoio ≈ 11%)</td><td class="val">10 000 €</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Bem instruído (pedido, informação técnica, cabimento).</td></tr>
+<tr data-key="r13" data-f="green"><td class="num">13</td><td class="prop">774-AB/2026</td><td>JF Rio de Mouro — Cross Run XI GP Carlos Correia (Troféu Sintra a Correr)</td><td class="val">1 500 €</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Valor tabelado no Guia de Provas; pago a todos os organizadores.</td></tr>
+<tr data-key="r14" data-f="green"><td class="num">14</td><td class="prop">775-AB/2026</td><td>UF Agualva e Mira Sintra — 7.º Grande Prémio (Troféu Sintra a Correr)</td><td class="val">1 500 €</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Espelho do ponto 13.</td></tr>
+<tr data-key="r15" data-f="red"><td class="num">15</td><td class="prop">796-FD/2026</td><td>JF Montelavar — reparação de danos no cemitério paroquial "causados por intempéries"</td><td class="val">20 000 €</td><td><span class="chip c-red">🔴</span></td><td><select class="vsel" data-default="esclarecer" title="Sugestão original: Esclarecer → senão Abstenção"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Esclarecer → senão Abstenção</div></td><td class="nota">A proposta invoca intempéries "desde janeiro 2026", mas todos os anexos datam os danos de 19/03/2025 (depressão Martinho). O apoio repara campas de particulares (alvará perpétuo), sem orçamento adjudicado — orçamento de referência era 21 525 €. Fundamentação de facto incoerente.</td></tr>
+<tr data-key="r16" data-f="amber"><td class="num">16</td><td class="prop">824-P/2026</td><td>UF Massamá e Monte Abraão — Arraial Popular 2026 (custo 22 k€; apoio ≈ 45%) — <b>ratificação</b> de despacho do Presidente</td><td class="val">10 000 €</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ reparo"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ reparo</div></td><td class="nota">Pedido entrou a 26/06 — 5 dias depois de o evento acabar (21/06); a "urgência" que justifica a via do despacho não convence. Proporção do apoio (45%) muito acima da de Rio de Mouro (11%).</td></tr>
+<tr data-key="r17" data-f="amber"><td class="num">17</td><td class="prop">848-P/2026</td><td>JF Belas — Festas da Vila (30/07-02/08): apoio financeiro + logístico em géneros (10 570 €)</td><td class="val">20 570 €</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ reparo"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ reparo</div></td><td class="nota">O mais bem documentado dos apoios, mas a logística já estava em execução antes da deliberação da AM (pendões a 21/07, material a 28/07) — a AM valida facto consumado; evento começa no dia seguinte.</td></tr>
+<tr data-key="r18" data-f="amber"><td class="num">18</td><td class="prop">925-RAP/2026</td><td>Retificação da deliberação da Prop 625-RAP (16/06) para incluir expressamente os Anexos aos Aditamentos dos Autos de Transferência de Recursos às freguesias (art. 174.º CPA)</td><td class="val">s/ valor novo</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor se anexos distribuídos"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor se anexos distribuídos</div></td><td class="nota">Retificação de lapso formal é defensável, mas a AM aprova "expressamente" anexos cujos valores não estão reproduzidos no processo. Confirmar que o conteúdo não excede o deliberado a 16/06.</td></tr>
+
+<tr class="secrow"><td colspan="7">Património e domínio público</td></tr>
+<tr data-key="r19" data-f="green"><td class="num">19</td><td class="prop">696-P/2026</td><td>Desafetação de 110 m² (S. João das Lampas) — cedência gratuita de 1992 p/ estrada Fontanelas–Á-dos-Eis nunca utilizada; reversão p/ massa insolvente</td><td class="val">—</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Sem perda patrimonial efetiva. Proposta inicial foi retirada e reinstruída; agora documentada. Unanimidade na CMS.</td></tr>
+<tr data-key="r20" data-f="green"><td class="num">20</td><td class="prop">697-P/2026</td><td>Desafetação de 230 m² (Parcela B, Praia das Maçãs) — cedência de 2000 imposta sem base legal; PP da Praia das Maçãs revogado em 2022</td><td class="val">—</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Correção juridicamente devida (recomendações da Provedoria de Justiça); fim de utilidade pública extinto.</td></tr>
+<tr data-key="r21" data-f="green"><td class="num">21</td><td class="prop">754-P/2026</td><td>Cedência do Edifício Multiusos Cultural de Belas (276 m²) à Freguesia de Belas — 5 anos renováveis</td><td class="val">renda 515 €/mês</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Renda = avaliação com desconto de 50% regulamentar; todos os encargos correntes ficam na Freguesia; programação municipal tem prioridade. Nota: Freguesia pode subceder e reter a receita.</td></tr>
+<tr data-key="r22" data-f="amber"><td class="num">22</td><td class="prop">797-FD/2026</td><td>Mutação dominial com a IP, SA — municipalização de 2,84 km da EN 247-4 (Estrada do Cabo da Roca)</td><td class="val">IP paga 18 925 €</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ reservas"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ reservas</div></td><td class="nota">Ganha-se autonomia de gestão (pedidos antigos de segurança na Azóia), mas o Município assume para sempre a manutenção + responsabilidade civil de uma estrada de forte pressão turística por uma compensação única de apenas 18,9 k€.</td></tr>
+<tr data-key="r23" data-f="green"><td class="num">23</td><td class="prop">846-P/2026</td><td>Afetação ao domínio público de 134 m² — Travessa da Liberdade, Montelavar (já ocupados pela via)</td><td class="val">—</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Regularização cadastral sem encargos; a pedido do proprietário.</td></tr>
+<tr data-key="r24" data-f="green"><td class="num">24</td><td class="prop">847-P/2026</td><td>Afetação ao domínio público de 19 m² — Travessa da Liberdade, Montelavar</td><td class="val">—</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor</div></td><td class="nota">Idêntico ao ponto 23.</td></tr>
+<tr data-key="r25" data-f="amber"><td class="num">25</td><td class="prop">849-P/2026</td><td>Aquisição do prédio Av. Heliodoro Salgado 5-7 (antigo Ed. Tirol, Estefânia; 870 m² terreno, 610 m² ABC) para serviços municipais — sujeito a visto do TdC</td><td class="val"><b>1 400 000 €</b></td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ pergunta"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ pergunta</div></td><td class="nota">Formalmente robusto: avaliação externa (PVT 1 505 245 €), preço 7% abaixo, negociação documentada, unanimidade na CMS. Mas os vendedores compraram o prédio em dez/2023 e o preço dessa transação não consta do processo — a mais-valia à custa do erário é desconhecida.</td></tr>
+
+<tr class="secrow"><td colspan="7">Bloco 26-86 — Regularizações de sedes de coletividades (Lei 29/2024)</td></tr>
+<tr data-key="r26" data-f="green"><td class="num">26-86</td><td class="prop">827-845-P<br>869-910-AB</td><td><b>61 reconhecimentos de interesse público municipal</b> para regularização urbanística de sedes de filarmónicas, clubes, bombeiros, IPSS, creches e centros sociais — documento de instrução exigido pela Lei 29/2024 (regime válido até set/2027), com critérios pré-fixados pela Prop 773-AB/2026</td><td class="val">sem encargos</td><td><span class="chip c-green">🟢</span></td><td><select class="vsel" data-default="favor" title="Sugestão original: Favor (em bloco)"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor (em bloco)</div></td><td class="nota">Template idêntico, sem efeitos constitutivos nem financeiros (salvaguardas expressas: não garante legalização e caduca se o pedido não for feito no prazo). Unanimidade na CMS em todos. ⚠️ Duas exceções 🟡 abaixo: pts. 69 e 84 (usos sensíveis sem parecer técnico anexo).</td></tr>
+<tr data-key="r27" data-f="amber"><td class="num">69</td><td class="prop">893-AB/2026</td><td>Instituto São João de Deus — Casa de Saúde do Telhal (unidades de internamento + futura Unidade de Demências)</td><td class="val">—</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ nota"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ nota</div></td><td class="nota">Única instalação de saúde com internamento no bloco; nenhum elemento técnico sobre segurança do edificado (incêndio) acompanha a proposta — controlo fica todo diferido para a fase de legalização.</td></tr>
+<tr data-key="r28" data-f="amber"><td class="num">84</td><td class="prop">908-AB/2026</td><td>Santa Casa da Misericórdia de Sintra — 4 instalações (sede + 2 creches + 1 jardim de infância)</td><td class="val">—</td><td><span class="chip c-amber">🟡</span></td><td><select class="vsel" data-default="reservas" title="Sugestão original: Favor c/ nota"><option value="favor">A favor</option><option value="reservas">Favor c/ reservas</option><option value="abst">Abstenção</option><option value="contra">Contra</option><option value="esclarecer">Esclarecer 1.º</option></select><div class="sug">sug.: Favor c/ nota</div></td><td class="nota">Usos sensíveis (crianças) em edifícios sem título urbanístico; mitigado por licenciamento setorial da Segurança Social.</td></tr>
+</tbody>
+</table>
+
+<details>
+<summary>Ver as 61 entidades do bloco 26-86</summary>
+<div class="bloco">
+<div><b>26</b> · 827-P · Soc. Filarmónica Os Aliados (S. Pedro Penaferrim)</div>
+<div><b>27</b> · 828-P · Soc. Recreativa e Musical de Almoçageme</div>
+<div><b>28</b> · 829-P · Soc. Filarmónica União Assaforense</div>
+<div><b>29</b> · 830-P · Grupo Bandolinista 22 de Maio de 1925 (Idanha)</div>
+<div><b>30</b> · 831-P · Byfurcação Associação Cultural (Sintra)</div>
+<div><b>31</b> · 832-P · SRD Os Progressistas de Cabrela</div>
+<div><b>32</b> · 833-P · Assoc. Cultural, Social e Recreativa de Cabriz</div>
+<div><b>33</b> · 834-P · Grupo Folclórico Os Camponeses de D. Maria</div>
+<div><b>34</b> · 835-P · União Recr. e Desportiva de Fontanelas e Gouveia</div>
+<div><b>35</b> · 836-P · Soc. Filarmónica IRF de Lameiras</div>
+<div><b>36</b> · 837-P · Soc. Filarmónica de Mira Sintra</div>
+<div><b>37</b> · 838-P · Soc. Filarmónica Boa União Montelavarense</div>
+<div><b>38</b> · 839-P · Grupo Folclórico Cultural da Rinchoa-Sintra</div>
+<div><b>39</b> · 840-P · União Desportiva e Recreativa Sabuguense</div>
+<div><b>40</b> · 841-P · SRDF de São João das Lampas</div>
+<div><b>41</b> · 842-P · Assoc. Prop. e Moradores da Serra da Silveira (Belas)</div>
+<div><b>42</b> · 843-P · Centro de Convívio e Ativ. Sociais da Tojeira</div>
+<div><b>43</b> · 844-P · Tuna Euterpe União Penedense (Penedo)</div>
+<div><b>44</b> · 845-P · Valdevinos Associação Cultural (Agualva)</div>
+<div><b>45</b> · 869-AB · Bombeiros Voluntários de Almoçageme</div>
+<div><b>46</b> · 870-AB · Bombeiros Voluntários de Colares</div>
+<div><b>47</b> · 871-AB · Bombeiros Voluntários de Belas</div>
+<div><b>48</b> · 872-AB · Bombeiros Voluntários de Agualva-Cacém</div>
+<div><b>49</b> · 873-AB · Arsenal 72 — Desporto e Cultura</div>
+<div><b>50</b> · 874-AB · Clube Atlético de Queluz Sintra Património Mundial</div>
+<div><b>51</b> · 875-AB · Clube Desportivo de Belas</div>
+<div><b>52</b> · 876-AB · GD Rio de Mouro, Rinchoa e Mercês</div>
+<div><b>53</b> · 877-AB · GDR de Manique de Cima</div>
+<div><b>54</b> · 878-AB · GDR "Os Lobinhos" (Almargem do Bispo)</div>
+<div><b>55</b> · 879-AB · Grupo União Recreativo do Linhó</div>
+<div><b>56</b> · 880-AB · GUR e Desportivo MTBA (S. João das Lampas)</div>
+<div><b>57</b> · 881-AB · URCA — União Recr. e Cultural da Abrunheira</div>
+<div><b>58</b> · 882-AB · União Mucifalense (Colares)</div>
+<div><b>59</b> · 883-AB · Janas Futebol Clube</div>
+<div><b>60</b> · 884-AB · Juventude Operária de Monte Abraão</div>
+<div><b>61</b> · 885-AB · Real Sport Clube (Massamá/Monte Abraão)</div>
+<div><b>62</b> · 886-AB · Rockonwheels — Moto Clube Rio de Mouro</div>
+<div><b>63</b> · 887-AB · SRD de Negrais</div>
+<div><b>64</b> · 888-AB · Sport União Sintrense</div>
+<div><b>65</b> · 889-AB · Soc. Recreativa da Várzea de Sintra</div>
+<div><b>66</b> · 890-AB · Soc. Recreativa de Santa Susana e Pobral</div>
+<div><b>67</b> · 891-AB · SR "Os Alegres de Maceira" (Montelavar)</div>
+<div><b>68</b> · 892-AB · Clube de Aeromodelismo de Assafora</div>
+<div><b>69</b> · 893-AB · 🟡 Instituto S. João de Deus — Casa de Saúde do Telhal</div>
+<div><b>70</b> · 894-AB · Centro Social da Sagrada Família (Pego Longo)</div>
+<div><b>71</b> · 895-AB · Ares do Pinhal — Comunidade Terapêutica da Rinchoa</div>
+<div><b>72</b> · 896-AB · ARPI de Dona Maria</div>
+<div><b>73</b> · 897-AB · Assoc. Promotora da Criança (Rio de Mouro)</div>
+<div><b>74</b> · 898-AB · Creche Sempre em Flor (Mem Martins)</div>
+<div><b>75</b> · 899-AB · Projeto Crescer — Associação (Belas)</div>
+<div><b>76</b> · 900-AB · CSC Reformados e Idosos de Morelena</div>
+<div><b>77</b> · 901-AB · Centro Social e Paroquial de Algueirão, MM e Mercês</div>
+<div><b>78</b> · 902-AB · Centro Social da Quinta da Boa Vista (Belas)</div>
+<div><b>79</b> · 903-AB · Fábrica da Igreja S. Francisco de Assis (Mira Sintra)</div>
+<div><b>80</b> · 904-AB · Cooperativa de Ensino Os Leõezinhos (Sintra)</div>
+<div><b>81</b> · 905-AB · Obra do Padre Gregório (Sintra)</div>
+<div><b>82</b> · 906-AB · Liga Amigos 3.ª Idade "Os Avós" (Portela)</div>
+<div><b>83</b> · 907-AB · ARPI "Os Resistentes de Aruil"</div>
+<div><b>84</b> · 908-AB · 🟡 Santa Casa da Misericórdia de Sintra (4 instalações)</div>
+<div><b>85</b> · 909-AB · Simples Partilha — Associação Cultural</div>
+<div><b>86</b> · 910-AB · Assoc. de Ensino Sénior de Queluz</div>
+</div>
+</details>
+
+<div class="foot">
+<b>Como ler a sessão:</b> os pontos 3 e 6 são um par — o 6 só produz efeitos se o 3 passar, e é no mapa do 6 que se vê o destino real dos 15 M€. Na CMS, o PS votou contra os 3/6 e absteve-se no 5; tudo o resto passou por unanimidade ou maioria confortável. Os pontos 10 e 11 não se votam (tomar conhecimento).<br><br>
+As sugestões de voto são técnicas (qualidade da instrução, fundamentação e risco financeiro) — a decisão política é tua. Análise gerada a partir do Edital n.º 12/26 e dos documentos da pasta 29.JUL.2026 (41 PDFs lidos).
+</div>
+
+</div>
+
+<div id="tab-resumos" class="tabpane">
+
+
+
+<div class="toc">
+  <a href="#p1">1 · Expediente e atas</a>
+  <a href="#p3">3 · Reforço de 15 M€ aos SMAS</a>
+  <a href="#p4">4 · Encargos plurianuais (6 empreitadas)</a>
+  <a href="#p5">5 · 2.ª Revisão Orçamento/GOP</a>
+  <a href="#p6">6 · Revisão Orçamental 2/2026 dos SMAS</a>
+  <a href="#p7">7 · Juízes Sociais 2026/2028</a>
+  <a href="#p8">8 · Medidas preventivas — Cacém</a>
+  <a href="#p9">9 · Contrato Sintra/Amadora — Carenque</a>
+  <a href="#p10">10 · UE Parque Ciência e Tecnologia Norte</a>
+  <a href="#p11">11 · UE Albarraque Sul</a>
+  <a href="#p12">12-17 · Apoios a juntas de freguesia</a>
+  <a href="#p18">18 · Retificação — autos de transferência</a>
+  <a href="#p19">19-20 · Desafetações de domínio público</a>
+  <a href="#p21">21 · Cedência do Multiusos de Belas</a>
+  <a href="#p22">22 · Mutação dominial — Cabo da Roca</a>
+  <a href="#p23">23-24 · Afetações — Montelavar</a>
+  <a href="#p25">25 · Aquisição do edifício da Estefânia</a>
+  <a href="#p26">26-86 · Regularizações de coletividades</a>
+</div>
+
+<h2>Período inicial</h2>
+
+<h3 id="p1">Ponto 1 — Expediente e atas <span class="p">· Atas n.º 07/26 e 08/26</span></h3>
+<p>Ponto de rotina em duas partes: a tomada de conhecimento do expediente e informações dirigidas à Assembleia, e a aprovação das atas das duas sessões realizadas a 16 de junho de 2026 — a extraordinária (ata 07/26) e a ordinária (ata 08/26). A aprovação de atas segue a prática habitual: cabe aos membros presentes nas sessões em causa confirmar que o texto reflete o que se passou; quem não esteve presente normalmente abstém-se. O ponto 2, que se segue, é o período de intervenção dos grupos políticos municipais previsto no Regimento, sem qualquer votação associada.</p>
+
+<h2>Finanças municipais</h2>
+
+<h3 id="p3">Ponto 3 — Proposta 699-P/2026 <span class="p">· Reforço financeiro de 15 M€ aos SMAS</span></h3>
+<div class="kv">Valor: 15.000.000 € · Transferência de capital não reembolsável · Executada por deliberação, sem contrato · Votação CMS: maioria, com voto contra do PS</div>
+<p>Esta é a proposta de maior valor da sessão e o desfecho de uma história que começou em 2025. Nesse ano, os SMAS lançaram um concurso para <em>alugar</em> 69 viaturas de recolha de resíduos sólidos urbanos por seis anos (2027-2032), com preço base de 70,6 M€ + IVA. Em fevereiro de 2026, o atual Conselho de Administração propôs a anulação desse concurso, invocando vícios substanciais: não existia estudo económico-financeiro prévio, o único candidato qualificado era o agrupamento Ecoambiente/SUMA (precisamente os atuais prestadores do serviço), o encargo anual de 14,46 M€ representaria 13-15% da despesa corrente dos SMAS e exigiria um aumento tarifário estimado em 20%, os SMAS dispõem de apenas 77 motoristas para operar 69 viaturas, e o método de recolha previsto (traseira/vertical) é 3 a 4 vezes mais lento do que o sistema bilateral. A anulação foi decidida em março de 2026 ao abrigo do artigo 163.º do CPA; o agrupamento pronunciou-se contra em audiência prévia, e o CA sustenta que não há lugar a indemnização por nunca ter havido adjudicação.</p>
+<p>Com os contratos de aluguer atuais a caducar a 31 de dezembro de 2026, os SMAS optaram por <em>comprar</em> a frota: 39 viaturas numa primeira fase (12,11 M€, contratos a aguardar visto prévio do Tribunal de Contas), cerca de 12 viaturas numa segunda fase (2,73 M€) e contentores para o novo sistema de recolha bilateral (2,32 M€) — um investimento global de 17,16 M€. Para o pagar, os SMAS desviaram verbas do seu plano de investimentos, nomeadamente das áreas da água e do saneamento.</p>
+<p>O que a AM vota é a reposição: o Município transfere 15 M€ para os SMAS como transferência de capital sem reembolso associado. Como os SMAS não têm personalidade jurídica própria (são parte integrante do Município, nos termos da Lei 50/2012), a operação é uma reafetação interna de recursos, concretizada por simples deliberação, sem contrato, sem criar dívida e sem passar pelo visto prévio do TdC (que incidirá, isso sim, sobre os contratos de compra das viaturas). A proposta inclui ainda uma alteração à política financeira entre a Câmara e os SMAS: o Município reserva-se o direito de, nos próximos exercícios, receber os resultados líquidos gerados pelos SMAS (7,4 M€ acumulados em 2023-2025, nunca distribuídos) "por forma a consolidar o apoio", podendo em alternativa determinar a sua aplicação em investimentos dos próprios SMAS. O documento de suporte afirma simultaneamente que a compra da frota "não introduziu qualquer dificuldade de tesouraria" e que não haverá alteração tarifária.</p>
+
+<h3 id="p4">Ponto 4 — Proposta 753-P/2026 <span class="p">· Autorização de encargos plurianuais — 6 empreitadas</span></h3>
+<div class="kv">Valor total: 13.176.415 € (2027-2030) · Votação CMS: unanimidade</div>
+<p>A lei dos compromissos (LCPA) e o regime da despesa pública exigem que a abertura de procedimentos cujos encargos recaiam sobre anos económicos futuros seja previamente autorizada pela Assembleia Municipal. Esta proposta pede essa autorização para seis empreitadas de espaço público cujos pagamentos cairão integralmente entre 2027 e 2030: requalificações em Montelavar, Massamá e Casal de Cambra, a via ciclável de Agualva, a intervenção no Rio de Côes e o Parque dos Hibiscos. Todas têm declaração de dotação emitida pela Direção Financeira. Duas das seis ações são novas; as restantes correspondem a reprogramações de intervenções já previstas cujos calendários deslizaram.</p>
+
+<h3 id="p5">Ponto 5 — Proposta 825-P/2026 <span class="p">· 2.ª Revisão ao Orçamento e GOP 2026-2030</span></h3>
+<div class="kv">Orçamento 2026: inalterado (633,7 M€; reforços = anulações = 569.790 €) · Aumento plurianual 2027-2030: +86,4 M€ nas GOP, dos quais 74,9 M€ em novos procedimentos + 11,55 M€ em dois projetos novos · Votação CMS: maioria, com abstenção do PS</div>
+<p>Uma revisão orçamental é o instrumento que permite alterar um orçamento em vigor quando se inscrevem projetos novos ou se alteram compromissos plurianuais — e carece sempre de aprovação da Assembleia. Esta revisão não mexe no total de 2026: o seu efeito está todo nos anos seguintes. Inscreve dois projetos novos — o Polo Escolar Rui Grácio (9,05 M€) e a beneficiação do Complexo Desportivo de Monte Abraão (2,5 M€) — e autoriza 74,9 M€ de novos procedimentos de despesa com encargos entre 2027 e 2030.</p>
+<p>A decomposição do Anexo I mostra para onde vai esse valor: cerca de 73% é habitação municipal no âmbito da Estratégia Local de Habitação — com destaque para a construção de 180 fogos na Rua José Afonso, em Agualva (41,1 M€ + 2 M€ de fiscalização), e de 44 fogos na Rua D. Maria II (9,9 M€) —, seguindo-se as creches de Meleças e Ana Castro Osório (7,5 M€), os três centros de saúde (Tapada das Mercês, Mira Sintra e Rio de Mouro, reprogramados com um reforço líquido de 6,8 M€), obras escolares incluindo a ES Stuart Carvalhais (3,9 M€), o centro de formação da GNR (1,5 M€) e a ampliação/ETAR do canil municipal (1,8 M€).</p>
+<p>O perfil temporal explica-se pelo ritmo físico das obras: 2027 concentra arranques (+9,96 M€ brutos, reduzidos a +3,4 M€ líquidos pelos adiamentos da obra da Rua Elias Garcia no Cacém e dos centros de saúde, que deslizam para 2028/29); 2028 é o pico (+38,4 M€), com todas as grandes obras em construção simultânea; 2029 mantém o esforço (+28,9 M€); 2030 é a cauda final dos 180 fogos (+4,2 M€). A mesma revisão reprograma ainda o complexo Ferreira Dias, transferindo 13,1 M€ (64% da dotação) de 2026 para 2027, e ajusta Serra das Minas e Algueirão. O processo não identifica as fontes de financiamento dos novos compromissos (receita própria, PRR, 1.º Direito ou outras comparticipações).</p>
+
+<h3 id="p6">Ponto 6 — Proposta 826-P/2026 <span class="p">· Homologação da Revisão Orçamental n.º 2/2026 dos SMAS</span></h3>
+<div class="kv">Valor: +15.000.000 € (receita e despesa dos SMAS) · Eficácia condicionada à aprovação do ponto 3 · Votação CMS: maioria, com voto contra do PS</div>
+<p>É a operação-espelho do ponto 3, vista do lado dos SMAS: a 2.ª revisão orçamental dos serviços municipalizados integra os 15 M€ como receita de capital e distribui-os pelas rubricas de despesa das Grandes Opções do Plano. A deliberação do CA dos SMAS (14 de julho) condicionou expressamente a eficácia desta revisão à aprovação prévia da transferência pela Câmara e pela Assembleia — os dois pontos formam, por isso, um par indissociável. Na distribuição da verba, cerca de 10,43 M€ reforçam a rubrica de equipamento de transporte e 3,10 M€ a de equipamento básico (ambas associadas à operação de resíduos), com o remanescente (~1,47 M€) distribuído por rubricas das áreas de águas de abastecimento, saneamento e atividades de apoio. Os mapas oficiais anexos apresentam valores acumulados do orçamento dos SMAS, pelo que o efeito isolado desta revisão se lê sobretudo no quadro da comunicação de serviço que acompanha a proposta.</p>
+
+<h2>Eleições e urbanismo</h2>
+
+<h3 id="p7">Ponto 7 — Proposta 793-EB/2026 <span class="p">· Listas de Juízes Sociais — biénio 2026/2028</span></h3>
+<p>Os juízes sociais são cidadãos que participam, junto dos tribunais, nos processos de promoção e proteção de crianças e jovens em perigo — uma função cívica prevista na lei, cujo recrutamento cabe aos municípios. A Assembleia aprova as listas de candidatos que serão depois remetidas para nomeação. O processo decorreu por edital público, com 44 candidaturas, das quais foram selecionados 15 efetivos e 15 suplentes segundo os critérios publicitados. É competência formal da AM e um ponto tipicamente consensual.</p>
+
+<h3 id="p8">Ponto 8 — Proposta 695-P/2026 <span class="p">· Prorrogação das medidas preventivas — Área Central do Cacém</span></h3>
+<div class="kv">Prorrogação: +1 ano (até 19/07/2027, limite legal máximo) · Parecer favorável CCDR-LVT (09/06/2026) · Votação CMS: unanimidade</div>
+<p>O Plano de Pormenor da Área Central do Cacém data de 2003, do tempo do programa Polis, e as suas regras impedem hoje a construção de habitação municipal em parcelas do próprio Município — casos que integram a Estratégia Local de Habitação, como a Parcela E da Rua Elias Garcia (presente no ponto 5). Como a revisão de um plano de pormenor demora anos, a Câmara seguiu em 2024 o caminho clássico: suspendeu parcialmente o plano nas parcelas em causa (passando a aplicar-se o PDM, que viabiliza os projetos) e estabeleceu medidas preventivas — o regime cautelar que a lei exige para acompanhar uma suspensão, condicionando outras operações urbanísticas na zona para que ninguém comprometa o plano futuro. Em paralelo, iniciou a alteração do plano (deliberada em fevereiro de 2024, publicitada em dezembro de 2024, prazo máximo de 3 anos).</p>
+<p>As medidas preventivas vigoraram por dois anos (19/07/2024 a 19/07/2026) e a alteração do plano não está concluída; vota-se agora a prorrogação por mais um ano — o máximo que a lei permite (2+1), sem possibilidade de nova extensão. A CCDR-LVT emitiu parecer favorável. O calendário resultante é apertado: a alteração do PP terá de estar concluída, aprovada (voltando à AM) e publicada até 19 de julho de 2027, sob pena de a suspensão cair e voltar a vigorar o plano de 2003. Regista-se ainda que as medidas caducaram a 19 de julho e a deliberação da AM ocorre a 29 — um desfasamento de dez dias cujo enquadramento jurídico merece confirmação em sessão.</p>
+
+<h3 id="p9">Ponto 9 — Proposta 798-FD/2026 <span class="p">· Contrato interadministrativo Sintra/Amadora — Vale da Ribeira de Carenque</span></h3>
+<div class="kv">Preço base: 214.000 € + IVA · Sintra: 60% (128.400 € + IVA) · Amadora: 40% · Votação CMS: unanimidade</div>
+<p>O "Eixo Verde e Azul do Jamor" é um protocolo de 2016 entre Sintra, Oeiras, Amadora e a Parques de Sintra para requalificar o corredor da bacia do Jamor. Esta proposta autoriza um contrato entre Sintra e Amadora para contratarem em conjunto — com Sintra a liderar o procedimento — a elaboração do <em>projeto de execução</em> da renaturalização e requalificação da Ribeira de Carenque, num troço de cerca de 6 km entre a mata da Quinta Nova e Casal de Cambra. Os custos repartem-se na proporção do território abrangido (60/40), com a Amadora a reembolsar Sintra por fases. Importa notar o âmbito: o contrato cobre apenas a fase de projeto; a execução das obras exigirá um aditamento e novas deliberações, e o investimento da empreitada não está ainda quantificado. O contrato carece de aprovação pelas Assembleias Municipais de ambos os concelhos.</p>
+
+<h3 id="p10">Ponto 10 — Proposta 700-P/2026 <span class="p">· UE do Parque de Ciência e Tecnologia Norte (tomar conhecimento)</span></h3>
+<div class="kv">13,5 ha · Rio de Mouro (Casal da Belavista) · Sistema de cooperação com 7 conjuntos de proprietários privados · Sem votação — mera tomada de conhecimento · CMS: maioria, abstenção do PS</div>
+<p>Uma unidade de execução (UE) é a figura que delimita um perímetro onde uma operação urbanística será executada de forma programada e concertada entre o município e os proprietários. Esta UE de 13,5 hectares, junto à Estrada Octávio Pato e ao limite com Cascais, destina-se ao futuro Parque de Ciência e Tecnologia Norte, com índice de utilização médio de 0,8 (edificabilidade abstrata de 57.551 m²) e usos que incluem espaços verdes, equipamentos e habitação pública ou a custos controlados. Os proprietários são todos privados (o maior prédio, com 115.633 m², pertence à Aralab).</p>
+<p>A minuta do contrato de urbanização estabelece a divisão de encargos: os privados promovem o loteamento, suportam os custos das infraestruturas e entregam ao Município uma parcela de 53.567 m² para o parque verde florestal (compensação por não cederem a totalidade das áreas exigidas pelo PDM); o Município projeta e executa a via circular norte-sul de ligação à Estrada Octávio Pato e o parque verde florestal, e concede reduções da TRIU proporcionais aos encargos privados com infraestruturas gerais, além de uma redução de 50% de taxas dependente de norma regulamentar habilitante. Prevê-se ainda a possibilidade de ressarcimento em numerário aos privados caso o valor da parcela entregue exceda a compensação devida. A discussão pública decorreu entre março e abril de 2026 sem qualquer participação. Prazos: 2 anos para apresentar o loteamento, 5 para concluir as operações.</p>
+
+<h3 id="p11">Ponto 11 — Proposta 701-P/2026 <span class="p">· UE de Albarraque Sul (tomar conhecimento)</span></h3>
+<div class="kv">5,5 ha · Rio de Mouro (Casal da Peça) · 88 fogos previstos · 2 conjuntos de proprietários privados · Sem votação — mera tomada de conhecimento · CMS: maioria, abstenção do PS</div>
+<p>Segunda unidade de execução da sessão, classificada com prioridade "A" no documento municipal de priorização. Prevê 88 fogos em edifícios de 4 a 6 pisos (índice 0,46; edificabilidade abstrata de 16.641 m²) e um novo parque verde urbano central de 2,15 hectares. Os proprietários privados são Luís Fernando de Amorim (dois prédios, 44.680 m²) e as irmãs Gomes Queirós ("Vivenda Cristal", 2.500 m²). Na divisão de encargos, os privados executam as obras de urbanização (Rua da Boavista e Rua Gonçalves Correia na 1.ª fase) e, como dação em cumprimento pela área de cedência em falta, constroem o edifício do lote L1 e entregam o piso térreo ao Município para equipamento público; o Município projeta, executa e assegura a manutenção futura da totalidade do parque de 2,15 ha, como compensação pela cedência em excesso, e aplica a redução de 50% de taxas — cujo regulamento habilitante a AM já aprovou em maio de 2026.</p>
+<p>A discussão pública recolheu três participações: uma de apoio; uma de um residente sobre o tráfego no nó da EN249-2/Av. Sidónio Pais e a falta de ciclovias (não acolhida — respondida com esclarecimentos e a referência ao reforço da Carris Metropolitana); e uma de um proprietário confinante questionando o traçado viário, a volumetria de 4-6 pisos numa envolvente de moradias e a gestão do parque — parcialmente acolhida, com um único ajuste: a eliminação de um caminho no desenho do parque. Prazos: 3 anos para o loteamento, 6 para conclusão.</p>
+
+<h2>Apoios às freguesias</h2>
+
+<h3 id="p12">Pontos 12 a 17 <span class="p">· Seis apoios a juntas de freguesia (total ~53.000 € + 10.570 € em géneros)</span></h3>
+<p><em>Ponto 12 (698-P, 10.000 €)</em> — Apoio às Festas da Vila de Rio de Mouro, organizadas pela Junta, com custo total estimado em cerca de 90.000 €; o apoio municipal cobre ~11%. Processo instruído com pedido, informação técnica e cabimento. <em>Pontos 13 e 14 (774-AB e 775-AB, 1.500 € cada)</em> — Apoios-espelho a duas provas do calendário "Sintra a Correr": o Cross Run de Rio de Mouro (XI Grande Prémio Carlos Correia) e o 7.º Grande Prémio de Agualva e Mira Sintra. O valor é o tabelado no Guia de Provas municipal, pago a todos os organizadores do circuito.</p>
+<p><em>Ponto 15 (796-FD, 20.000 €)</em> — Apoio à Junta de Montelavar para reparação de danos no cemitério paroquial atribuídos a intempéries. A proposta refere intempéries "desde janeiro de 2026", mas os documentos anexos datam os danos da depressão Martinho, de março de 2025; o orçamento de referência nos anexos é de 21.525 € e as reparações abrangem campas de concessionários particulares (alvarás perpétuos). <em>Ponto 16 (824-P, 10.000 €)</em> — Ratificação de um despacho do Presidente da Câmara que concedeu apoio ao Arraial Popular 2026 da UF de Massamá e Monte Abraão (custo total: 22.000 €; o apoio cobre ~45%). O evento realizou-se de 19 a 21 de junho; o pedido da Junta entrou a 26 de junho, e o apoio seguiu a via do despacho urgente com ratificação posterior pelos órgãos. <em>Ponto 17 (848-P, 10.000 € + 10.570 € em géneros)</em> — Apoio às Festas da Vila de Belas (30/07 a 02/08): além da verba, a Câmara presta apoio logístico valorizado — ramais de água e eletricidade (3.591 €), limpeza (1.700 €), sinalização de trânsito (1.761 €), mastros (711 €), mobiliário (1.728 €), quadros elétricos (750 €) e isenção de taxas (304 €). É o apoio mais detalhadamente documentado dos seis; o cronograma anexo mostra trabalhos preparatórios iniciados na semana anterior à deliberação, com a festa a começar no dia seguinte à sessão.</p>
+
+<h3 id="p18">Ponto 18 — Proposta 925-RAP/2026 <span class="p">· Retificação — Anexos aos Aditamentos dos Autos de Transferência</span></h3>
+<p>Em 16 de junho, a AM aprovou (Prop. 625-RAP) os aditamentos aos autos de transferência de recursos para as juntas de freguesia — o mecanismo pelo qual as competências delegadas nas freguesias são acompanhadas dos respetivos meios financeiros. Verificou-se depois que a deliberação não mencionava expressamente os anexos que fazem parte integrante desses aditamentos (os mapas por freguesia, de Algueirão-Mem Martins a Terrugem). Esta proposta retifica a deliberação ao abrigo do artigo 174.º do CPA, que permite a correção de inexatidões, incluindo agora a aprovação expressa dos anexos. É uma correção formal; o pressuposto é que os anexos não alteram os valores deliberados em junho.</p>
+
+<h2>Património e domínio público</h2>
+
+<h3 id="p19">Pontos 19 e 20 <span class="p">· Desafetações do domínio público (696-P: 110 m², S. João das Lampas · 697-P: 230 m², Praia das Maçãs)</span></h3>
+<p>Desafetar é o ato inverso de integrar no domínio público: a parcela deixa de ser pública e regressa ao comércio jurídico privado — competência exclusiva da Assembleia Municipal. <em>Ponto 19</em>: em 1992, cerca de vinte proprietários cederam gratuitamente parcelas para o alargamento da Estrada de Ligação de Fontanelas a Á-dos-Eis. Uma dessas parcelas (110 m²) nunca chegou a ser utilizada — alterações posteriores ao projeto da via tornaram-na desnecessária e os limites da propriedade nunca se alteraram no terreno. A administradora de insolvência do proprietário (processo 13476/21.3T8SNT) pediu a reversão. Uma primeira versão da proposta foi retirada em junho para melhor instrução, após pedido de esclarecimentos na Câmara; a versão reinstruída foi aprovada por unanimidade. <em>Ponto 20</em>: em 2000, o licenciamento de uma moradia em Colares foi condicionado à cedência de 245 m² para um arruamento previsto no Plano de Pormenor da Praia das Maçãs. A Parcela A (15 m²) está efetivamente integrada num arruamento; a Parcela B (230 m²) nunca teve uso público em 26 anos. Entretanto, a execução do PP foi revogada (2022) e a própria exigência de cedência, imposta no âmbito de um licenciamento de obra particular, carecia de base legal — em sentido contrário a recomendações da Provedoria de Justiça da época. A parcela reverte para o prédio de origem.</p>
+
+<h3 id="p21">Ponto 21 — Proposta 754-P/2026 <span class="p">· Cedência do Edifício Multiusos Cultural de Belas à Freguesia</span></h3>
+<div class="kv">276 m² · Praça 5 de Outubro, 17/17-A, Belas · Renda: 515 €/mês (avaliação com redução regulamentar de 50%) · 5 anos, renovável · Votação CMS: unanimidade</div>
+<p>O edifício, doado ao Município em 2018 (com obrigação de recuperação e direito de preferência do doador em caso de venda), é cedido em utilização à Freguesia de Belas para sessões da Assembleia de Freguesia e iniciativas de interesse público. A Freguesia passa a gerir o dia a dia e assume todos os encargos correntes — água, eletricidade, limpeza, segurança, seguros, conservação e reparações —, pagando uma renda de 515 €/mês, correspondente ao valor fixado pela Comissão de Avaliação com a redução de 50% prevista no Regulamento do Património Imóvel para entidades públicas. A propriedade mantém-se municipal, a programação cultural da Câmara conserva prioridade de utilização, e a cedência cessa sem indemnização se a Câmara retirar a disponibilidade do imóvel. A pedido da Junta, a cláusula 7.ª permite-lhe subceder pontualmente o espaço a terceiros, constituindo as contrapartidas receita própria da Freguesia.</p>
+
+<h3 id="p22">Ponto 22 — Proposta 797-FD/2026 <span class="p">· Mutação dominial — EN 247-4 (Estrada do Cabo da Roca)</span></h3>
+<div class="kv">2,84 km (Azóia → Farol do Cabo da Roca) · A IP paga ao Município 18.925 € (comparticipação única) · Manutenção futura: municipal · Votação CMS: maioria, abstenção do PS</div>
+<p>A EN 247-4 é a estrada que liga a Azóia ao Cabo da Roca — não integra o Plano Rodoviário Nacional, pelo que a lei (art. 40.º da Lei 34/2015) permite transferi-la da Infraestruturas de Portugal para o domínio público municipal por acordo. A transferência abrange tudo: faixa de rodagem, bermas, obras de arte, taludes, iluminação e sinalização (fica de fora apenas o canal técnico de telecomunicações, que permanece na IP). Como a IP não realizou as obras de conservação prévias, paga ao Município 18.925 € como comparticipação para a reposição do estado da via, obras que o próprio Município executará. Daí em diante, a manutenção e a responsabilidade civil perante terceiros passam a ser municipais. O contexto da operação são os pedidos recorrentes da população da Azóia e das entidades locais em matéria de segurança rodoviária e ordenamento do troço, muito pressionado pelo tráfego turístico do Cabo da Roca — com a estrada no domínio municipal, a Câmara ganha autonomia para intervir (semaforização, acalmia de tráfego, estacionamento) sem depender da IP. O acordo carece de homologação governamental.</p>
+
+<h3 id="p23">Pontos 23 e 24 <span class="p">· Afetações ao domínio público — Travessa da Liberdade, Montelavar (134 m² e 19 m²)</span></h3>
+<p>Movimento inverso ao dos pontos 19/20: aqui são os proprietários que formalizam a entrega de parcelas ao domínio público. As duas parcelas — 134 m² e 19 m², destacadas de prédios confinantes — estão há muito fisicamente ocupadas pela Travessa da Liberdade, em Montelavar, em plena fruição pública. Os próprios proprietários requereram a certificação da integração no domínio público, para poderem regularizar as áreas nas matrizes e registos. As parcelas estão infraestruturadas, livres de ónus e sem construções; não há qualquer contrapartida financeira. Ambas as propostas foram aprovadas por unanimidade na Câmara.</p>
+
+<h3 id="p25">Ponto 25 — Proposta 849-P/2026 <span class="p">· Aquisição do prédio da Av. Heliodoro Salgado, 5-7 (Estefânia)</span></h3>
+<div class="kv">Preço: 1.400.000 € · Avaliação externa (PVT): 1.505.245 € · Terreno 870 m², área bruta de construção 610 m² · Sujeito a fiscalização prévia do TdC · Votação CMS: unanimidade</div>
+<p>O Município propõe-se comprar o antigo "Edifício Tirol", na Estefânia (Vila de Sintra) — r/c + 2 andares + sótão, com logradouro de 562 m² — para nele instalar serviços municipais hoje dispersos. A aquisição de imóveis acima de determinado valor é competência da Assembleia (art. 25.º/1/i do RJAL) e o contrato será submetido a visto prévio do Tribunal de Contas. O processo inclui avaliação por perita da lista oficial do Tribunal da Relação de Lisboa, que fixou o presumível valor de transação em 1.505.245 € (média dos métodos comparativo e do rendimento); a negociação, documentada no processo, partiu de uma oferta municipal de 1,20 M€ contra um pedido de 1,50 M€, fechando em 1,40 M€ — 7% abaixo da avaliação e abaixo do valor por que o imóvel estava publicamente anunciado (1,58 M€). Os vendedores são três comproprietários que adquiriram o prédio em dezembro de 2023; o preço dessa transação anterior não consta do processo. Os emolumentos do TdC ficam a cargo dos vendedores; existe uma servidão de passagem registada a favor do prédio.</p>
+
+<h2>Regularizações de coletividades</h2>
+
+<h3 id="p26">Pontos 26 a 86 <span class="p">· 61 reconhecimentos de interesse público municipal (Lei 29/2024)</span></h3>
+<p>O bloco final da sessão é um conjunto de 61 propostas com estrutura idêntica, ao abrigo da Lei n.º 29/2024 — o regime extraordinário de regularização de equipamentos de utilização coletiva, válido até setembro de 2027. Muitas sedes de coletividades históricas do concelho (filarmónicas, clubes desportivos, associações de bombeiros, IPSS, creches, centros de dia) foram construídas ou ampliadas ao longo de décadas sem título urbanístico completo. A lei criou uma via extraordinária de legalização, cujo primeiro passo é o reconhecimento do interesse público municipal do edifício, deliberado pela Assembleia Municipal — é esse documento de instrução que aqui se vota, entidade a entidade. A Câmara fixou previamente os critérios de elegibilidade (Prop. 773-AB/2026) e todas as propostas passaram por unanimidade.</p>
+<p>O reconhecimento não tem efeitos financeiros nem constitutivos: não garante a legalização (que seguirá o seu procedimento próprio nos serviços de urbanismo, com todas as exigências técnicas) e caduca se o pedido não for apresentado no prazo legal. O universo abrangido dá um retrato do associativismo do concelho: 19 coletividades culturais e recreativas (pontos 26-44, incluindo oito filarmónicas), quatro associações de bombeiros voluntários (45-48), 20 clubes e grupos desportivos (49-68, do Real Sport Clube ao Sport União Sintrense) e 18 instituições sociais e educativas (69-86), entre as quais a Casa de Saúde do Telhal (unidades de internamento do Instituto São João de Deus), a Santa Casa da Misericórdia de Sintra (quatro instalações, incluindo creches), creches e centros de dia paroquiais e associativos. Nestes últimos casos — usos de saúde, infância e terceira idade — o controlo técnico do edificado ficará integralmente remetido para a fase de legalização urbanística, uma vez que o reconhecimento não é acompanhado de elementos técnicos sobre segurança.</p>
+
+<p class="nota-metodo">Documento de leitura preparado a partir do Edital n.º 12/26 e dos processos da pasta 29.JUL.2026 (41 PDFs analisados). Tom deliberadamente neutro e descritivo; a análise crítica, as flags e as posições de voto estão no quadro companheiro "AM Sintra — Quadro de Votação". Última atualização: 27 de julho de 2026.</p>
+
+</div>
+</div>
+
+<script>
+// ---- tabs ----
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+  window.scrollTo(0,0);
+}));
+
+// ---- filters ----
+const btns=document.querySelectorAll('.fbtn');
+const rows=document.querySelectorAll('#tbl tbody tr:not(.secrow)');
+const secs=document.querySelectorAll('#tbl tbody tr.secrow');
+btns.forEach(b=>b.addEventListener('click',()=>{
+  btns.forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  const f=b.dataset.f;
+  rows.forEach(r=>{r.style.display=(f==='all'||r.dataset.f===f)?'':'none';});
+  secs.forEach(s=>{
+    let n=s.nextElementSibling,vis=false;
+    while(n&&!n.classList.contains('secrow')){if(n.style.display!=='none')vis=true;n=n.nextElementSibling;}
+    s.style.display=vis?'':'none';
+  });
+}));
+
+// ---- votes: storage with safe fallback (works on GitHub Pages / local file; in-memory elsewhere) ----
+const KEY='am-sintra-votos-29jul2026';
+const mem={};
+const store={
+  get(){try{return JSON.parse(window.localStorage.getItem(KEY))||{};}catch(e){return mem;}},
+  set(v){try{window.localStorage.setItem(KEY,JSON.stringify(v));}catch(e){Object.assign(mem,v);}}
+};
+function paint(sel){
+  sel.className='vsel o-'+sel.value+(sel.value!==sel.dataset.default?' changed':'');
+}
+const saved=store.get();
+document.querySelectorAll('.vsel').forEach(sel=>{
+  const key=sel.closest('tr').dataset.key;
+  sel.value=(saved&&saved[key])||sel.dataset.default;
+  paint(sel);
+  sel.addEventListener('change',()=>{
+    const all=store.get()||{};
+    all[key]=sel.value;
+    store.set(all);
+    paint(sel);
+    const m=document.getElementById('savemsg');
+    m.textContent='✓ guardado';
+    setTimeout(()=>m.textContent='',1500);
+  });
+});
+document.getElementById('btn-reset').addEventListener('click',()=>{
+  if(!confirm('Repor todas as escolhas para as sugestões originais?'))return;
+  store.set({});
+  document.querySelectorAll('.vsel').forEach(sel=>{sel.value=sel.dataset.default;paint(sel);});
+});
+</script>
+</body>
+</html>
