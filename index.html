@@ -98,15 +98,12 @@
 
 <div id="tab-votacao" class="tabpane active">
 <div class="savebar">
-  <span>As tuas escolhas de voto ficam guardadas neste browser.</span>
+  <span id="syncstat" style="font-weight:600;color:var(--muted)">☁ a ligar…</span><span>Escolhas sincronizadas entre todos os que têm o link.</span>
   <button id="btn-reset">↺ Repor sugestões</button>
   <span id="savemsg"></span>
 </div>
 
-<header>
-  <h1>Assembleia Municipal de Sintra — 8.ª Sessão Extraordinária</h1>
-  <div class="sub">Quarta-feira, <b>29 de julho de 2026, 18h30</b> · Palácio Valenças · Edital n.º 12/26 · <b>86 pontos</b> · Sessão inicia com Intervenção do Público (máx. 8 inscrições) · Transmissão no YouTube da CMS</div>
-</header>
+
 
 <div class="tiles">
   <div class="tile"><div class="v">15,0 M€</div><div class="l">Reforço aos SMAS (pontos 3+6) — o tema da noite</div></div>
@@ -394,36 +391,64 @@ btns.forEach(b=>b.addEventListener('click',()=>{
   });
 }));
 
-// ---- votes: storage with safe fallback (works on GitHub Pages / local file; in-memory elsewhere) ----
+// ---- votes: local + cloud sync (jsonblob) ----
 const KEY='am-sintra-votos-29jul2026';
+const SYNC_URL='https://jsonblob.com/api/jsonBlob/019fa5a0-cc9a-7238-8464-6a2e0bdbbdea';
 const mem={};
 const store={
-  get(){try{return JSON.parse(window.localStorage.getItem(KEY))||{};}catch(e){return mem;}},
-  set(v){try{window.localStorage.setItem(KEY,JSON.stringify(v));}catch(e){Object.assign(mem,v);}}
+  get(){try{return JSON.parse(window.localStorage.getItem(KEY))||{votes:{},rev:0};}catch(e){return mem.s||{votes:{},rev:0};}},
+  set(v){try{window.localStorage.setItem(KEY,JSON.stringify(v));}catch(e){mem.s=v;}}
 };
-function paint(sel){
-  sel.className='vsel o-'+sel.value+(sel.value!==sel.dataset.default?' changed':'');
-}
-const saved=store.get();
-document.querySelectorAll('.vsel').forEach(sel=>{
-  const key=sel.closest('tr').dataset.key;
-  sel.value=(saved&&saved[key])||sel.dataset.default;
-  paint(sel);
-  sel.addEventListener('change',()=>{
-    const all=store.get()||{};
-    all[key]=sel.value;
-    store.set(all);
+function paint(sel){sel.className='vsel o-'+sel.value+(sel.value!==sel.dataset.default?' changed':'');}
+function apply(votes){
+  document.querySelectorAll('.vsel').forEach(sel=>{
+    const key=sel.closest('tr').dataset.key;
+    sel.value=(votes&&votes[key])||sel.dataset.default;
     paint(sel);
+  });
+}
+function setStat(txt,ok){const s=document.getElementById('syncstat');s.textContent=txt;s.style.color=ok?'var(--green)':'var(--amber)';}
+let state=store.get();
+apply(state.votes);
+async function pull(){
+  try{
+    const r=await fetch(SYNC_URL,{cache:'no-store'});
+    if(!r.ok)throw 0;
+    const remote=await r.json();
+    if((remote.rev||0)>(state.rev||0)){state=remote;store.set(state);apply(state.votes);}
+    else if((state.rev||0)>(remote.rev||0)){await push();}
+    setStat('☁ sincronizado ✓',true);
+  }catch(e){setStat('⚠ offline — só local',false);}
+}
+async function push(){
+  try{
+    const r=await fetch(SYNC_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)});
+    if(!r.ok)throw 0;
+    setStat('☁ sincronizado ✓',true);
+  }catch(e){setStat('⚠ offline — guardado local',false);}
+}
+document.querySelectorAll('.vsel').forEach(sel=>{
+  sel.addEventListener('change',()=>{
+    const key=sel.closest('tr').dataset.key;
+    state.votes[key]=sel.value;
+    state.rev=Date.now();
+    store.set(state);
+    paint(sel);
+    push();
     const m=document.getElementById('savemsg');
     m.textContent='✓ guardado';
     setTimeout(()=>m.textContent='',1500);
   });
 });
-document.getElementById('btn-reset').addEventListener('click',()=>{
-  if(!confirm('Repor todas as escolhas para as sugestões originais?'))return;
-  store.set({});
-  document.querySelectorAll('.vsel').forEach(sel=>{sel.value=sel.dataset.default;paint(sel);});
+document.getElementById('btn-reset').addEventListener('click',async()=>{
+  if(!confirm('Repor todas as escolhas para as sugestões originais (para toda a gente)?'))return;
+  state={votes:{},rev:Date.now()};
+  store.set(state);
+  apply({});
+  push();
 });
+pull();
+setInterval(pull,20000);
 </script>
 </body>
 </html>
