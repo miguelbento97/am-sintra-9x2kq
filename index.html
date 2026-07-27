@@ -392,7 +392,7 @@ btns.forEach(b=>b.addEventListener('click',()=>{
 }));
 
 // ---- votes: local + cloud sync (jsonblob) ----
-const KEY='am-sintra-votos-29jul2026';
+const KEY='am-sintra-votos-29jul2026-v2';
 const SYNC_URL='https://jsonblob.com/api/jsonBlob/019fa5a0-cc9a-7238-8464-6a2e0bdbbdea';
 const mem={};
 const store={
@@ -409,6 +409,7 @@ function apply(votes){
 }
 function setStat(txt,ok){const s=document.getElementById('syncstat');s.textContent=txt;s.style.color=ok?'var(--green)':'var(--amber)';}
 let state=store.get();
+if(!state||typeof state.votes!=='object'||!state.votes)state={votes:{},rev:0};
 apply(state.votes);
 async function pull(){
   try{
